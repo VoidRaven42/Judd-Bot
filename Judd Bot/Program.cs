@@ -58,16 +58,8 @@ namespace Judd_Bot
             commands.RegisterCommands<AdministrationCommands>();
 
             await discord.ConnectAsync();
-            await Run();
             await Task.Delay(-1);
 
-        }
-
-        private static async Task Run()
-        {
-            Int32 port = 50000;
-            Server socketserver = new Server(port);
-            return;
         }
     }
 }

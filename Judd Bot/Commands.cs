@@ -6,20 +6,24 @@ using System.Linq.Expressions;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
+using Discord;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
+using DSharpPlus.CommandsNext.Converters;
 using DSharpPlus.Entities;
 using DSharpPlus.Interactivity;
+using ChannelType = DSharpPlus.ChannelType;
+using TokenType = DSharpPlus.TokenType;
 
 namespace Judd_Bot
 {
     public class Commands : BaseCommandModule
     {
-        [Command("hi")]
+        [Command("wood")]
         public async Task Hi(CommandContext ctx)
         {
-            await ctx.RespondAsync($"Hi, {ctx.User.Username}!");
+            await ctx.RespondAsync("\n⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⢀⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⡀⠄⠄⠄⢀⠄⠄⠈⠄⠄⠄⠄⠄⠄⠄⠠⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⣌⠄⠪⠢⠁⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⡀⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⡐⠜⠄⠄⠄⡠⣄⠠⠄⠄⠄⠄⠄⠄⠄⠄⣘⢢⣤⡀⠄⠄⠙⠒⠒⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠤⠯⡂⠁⢠⣴⣿⣿⣿⣦⠄⢀⠄⠄⠄⢠⣴⣔⣿⣿⣿⣿⣷⡀⠄⠄⠄⢰⠉⣁⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⠄⣀⣤⡾⠂⢀⣴⣿⣿⣿⣿⣿⣿⣿⣿⣷⣺⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣧⡀⠄⠄⠈⠄⠂⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⠄⣠⣒⠑⠄⣸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⠄⠄⠄⠐⡁⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⠄⢼⡇⠄⢰⢺⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣆⠄⠄⣹⡗⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⠠⣿⠇⠄⢂⡜⠛⠿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣇⠄⠐⡃⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⢀⢛⠄⠄⠈⡿⣷⣶⡌⠉⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⢟⣫⣿⣷⣶⡯⣿⡆⠄⠠⡀⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⠘⠄⠄⠄⠄⢸⡜⣿⣿⣷⣄⡀⠙⠿⣿⣿⣿⣿⣿⡿⠟⢁⣠⣾⠿⣿⣿⣿⣿⣾⡿⠠⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⠐⠄⠄⠄⠄⠘⣡⣿⣿⠃⠉⠛⢦⣀⠈⠛⣿⣿⠋⠄⡤⠞⠋⠄⢠⣿⣿⡿⣿⣿⡇⠄⠄⢠⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠠⠶⢄⠄⠄⣾⡰⠟⠉⠁⠄⠄⠄⠄⠈⠁⠄⢹⡇⠄⠈⠄⠄⠄⠄⠄⠉⠛⢷⣹⣿⡇⠄⢂⡴⡦⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⠠⢀⠄⠈⡷⠅⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⣸⣧⡀⠄⠄⠄⠄⠄⠄⠄⣀⣘⣿⣿⡏⠄⢈⡀⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⠄⠈⠄⠄⣿⣷⣷⣲⣤⣀⣀⣀⣤⣦⣦⣾⣿⣿⣿⣶⣴⣆⣤⣤⣴⣶⣿⣿⣿⣿⣗⡄⢙⡇⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⠄⣀⣀⡇⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣾⠇⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⠄⠘⠛⢀⠄⠙⠛⠛⠛⠛⠉⠭⠚⠉⠛⠛⠛⠛⠛⠛⣽⣷⣤⠉⠛⣿⣿⣿⣿⣿⣿⣿⠁⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⠄⠄⠈⠛⠄⠄⠄⣤⡆⠄⠄⠈⣽⣤⣀⣀⠄⣀⣠⣾⣿⣿⣿⣆⠄⢸⣿⣿⣿⣿⡿⠟⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⢸⣧⡄⠄⠄⠄⣤⣤⣤⣭⣭⣤⣶⣶⣦⡌⢿⠗⣼⣿⣿⣿⣿⡇⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⢸⣿⣇⠄⠄⡴⠉⠉⠉⡉⣉⣩⣿⣿⣿⣿⠄⠄⠘⣿⡟⠋⠘⠃⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⡀⡀⠄⢻⣿⠄⢸⣏⣿⣿⣷⣿⣿⣿⣿⣿⣿⣿⡀⢀⣰⣿⡇⠄⣠⡀⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⢠⣴⣶⣿⣿⣿⣿⡀⠘⠻⣶⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⣿⣿⣾⣿⡿⠃⢀⣿⣧⣀⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⢀⣼⣿⣿⣿⣿⣿⣿⣿⣷⠄⠄⠄⠄⠄⠄⠈⠉⠉⠉⠄⠄⠄⠄⠄⠙⠛⠋⣀⣸⣿⣿⣿⠏⠁⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⢀⣤⣶⣿⣿⣿⡿⠃⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣇⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⢀⣶⣶⣿⣿⣿⣿⣿⠟⠄⠄⠄⠄⠄⠄⠁⠔⣄⡀⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⣠⣿⣿⣿⣿⣿⣿⣿⣿⢿⣿⣿⣄⡀⠄⠄⠄⠄⢀⣠⣴⣿⣿⣿⣿⣿⣿⣿⡿⠇⠄⠄⠄⠄⠄⠈⠄⠈⠉⠩⠉⢙⠷⡄⣀\n");
         }
 
         [Command("echo")]
@@ -32,6 +36,17 @@ namespace Judd_Bot
             }
             await ctx.RespondAsync(tosendmessage);
         }
+
+        [Command("test")]
+        public async Task Test(CommandContext ctx, string message)
+        {
+            var tosend = message.Split('|').ToList();
+            foreach (var elem in tosend)
+            {
+                await ctx.RespondAsync(elem);
+            }
+        }
+
 
         [Command("math")]
         [Description("Does simple math, (+, -, *, /), called with \"!math (first num.) (operation) (second num.)\"")]
@@ -77,19 +92,21 @@ namespace Judd_Bot
         }
 
         [Command("assignroles")]
-        public async Task Assign(string id, [RemainingText]String remaining)
+        public async Task Assign(CommandContext ctx, string message)
         {
-            var intakeStrings = remaining.Split(' ').ToList();
+            var intakeStrings = message.Split(' ').ToList();
             string classes = "";
+            var id = intakeStrings[0];
+            intakeStrings.RemoveAt(0);
             foreach (var elem in intakeStrings)
             {
                 classes = classes + elem + " ";
             }
 
             var rolestoadd = classes.Split(',');
-            string token = File.ReadAllText(@"token.txt");
+            var token = File.ReadAllText(@"token.txt");
 
-            DiscordRestClient discord = new DiscordRestClient(new DiscordConfiguration
+            var discord = new DiscordRestClient(new DiscordConfiguration
             {
                 Token = token,
                 TokenType = TokenType.Bot,
@@ -97,23 +114,29 @@ namespace Judd_Bot
                 LogLevel = LogLevel.Debug
             });
             var userid = Convert.ToUInt64(id);
-            DiscordGuild guild = await discord.GetGuildAsync(718945666348351570);
+            var guild = await discord.GetGuildAsync(718945666348351570);
             foreach (var elem in rolestoadd)
             {
-                if (guild.Roles.Any(tr => tr.Value.Name.Equals(elem)))
+                var trimmed = elem.Trim();
+                if (guild.Roles.Any(tr => tr.Value.Name.Equals(trimmed)))
                 {
-                    var roleid = guild.Roles.FirstOrDefault(x => x.Value.Name.ToString() == elem).Key;
+                    var roleid = guild.Roles.FirstOrDefault(x => x.Value.Name.ToString() == trimmed).Key;
                     await discord.AddGuildMemberRoleAsync(718945666348351570, userid, roleid, "");
                 }
                 else
                 {
-                    var name = elem;
-                    var role = await guild.CreateRoleAsync(name, permissions:Permissions.SendMessages);
-                    var channel = await guild.CreateChannelAsync(elem, ChannelType.Text);
-                    await channel.AddOverwriteAsync(role, Permissions.SendMessages);
-                    await discord.AddGuildMemberRoleAsync(718945666348351570, userid, role.Id, "");
+                    var role = await guild.CreateRoleAsync(trimmed, permissions:Permissions.SendMessages);
+                    var channel = await guild.CreateChannelAsync(trimmed, ChannelType.Text);
+                    var voicechannel = await guild.CreateChannelAsync(trimmed, ChannelType.Voice);
                     await discord.ModifyChannelAsync(channel.Id, channel.Name, 0, "", false, parent: 718991556107042817,
                         bitrate: null, userLimit: 0, perUserRateLimit: 0, "");
+                    await discord.ModifyChannelAsync(voicechannel.Id, voicechannel.Name, 0, "", false, parent: 718945666797404230,
+                        bitrate: 64000, userLimit: 0, perUserRateLimit: 0, "");
+                    await channel.AddOverwriteAsync(role, Permissions.AccessChannels);
+                    await voicechannel.AddOverwriteAsync(role, Permissions.AccessChannels);
+                    await channel.AddOverwriteAsync(guild.EveryoneRole, Permissions.None, Permissions.AccessChannels);
+                    await voicechannel.AddOverwriteAsync(guild.EveryoneRole, Permissions.None, Permissions.AccessChannels);
+                    await discord.AddGuildMemberRoleAsync(718945666348351570, userid, role.Id, "");
                 }
             }
         }
