@@ -42,11 +42,7 @@ namespace Judd_Bot
                 LogLevel = LogLevel.Debug
             });
 
-            discord.MessageCreated += async e =>
-            {
-                if (e.Message.Content.ToLower().StartsWith("ping"))
-                    await e.Message.RespondAsync("pong!");
-            };
+            discord.GuildMemberAdded += Discord_GuildMemberAdded;
 
             string[] prefixes = { "!" };
             commands = discord.UseCommandsNext(new CommandsNextConfiguration
@@ -60,6 +56,11 @@ namespace Judd_Bot
             await discord.ConnectAsync();
             await Task.Delay(-1);
 
+        }
+
+        private static async Task Discord_GuildMemberAdded(DSharpPlus.EventArgs.GuildMemberAddEventArgs e)
+        {
+            await Server.SQLQuery(e.Member.Id.ToString());
         }
     }
 }
