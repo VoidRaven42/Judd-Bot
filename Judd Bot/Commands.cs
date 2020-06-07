@@ -36,18 +36,7 @@ namespace Judd_Bot
             }
             await ctx.RespondAsync(tosendmessage);
         }
-
-        [Command("test")]
-        public async Task Test(CommandContext ctx, string message)
-        {
-            var tosend = message.Split('|').ToList();
-            foreach (var elem in tosend)
-            {
-                await ctx.RespondAsync(elem);
-            }
-        }
-
-
+        
         [Command("math")]
         [Description("Does simple math, (+, -, *, /), called with \"!math (first num.) (operation) (second num.)\"")]
         [Aliases("maths")]
