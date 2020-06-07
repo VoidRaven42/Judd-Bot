@@ -25,7 +25,7 @@ namespace Judd_Bot
                 Console.WriteLine("Connecting to Database...");
                 conn.Open();
 
-                string sql = "SELECT Name, HeadOfState FROM Country WHERE Continent='Oceania'";
+                string sql = "SELECT Name, HeadOfState FROM Country WHERE Continent='Oceania'"; //Placeholder
                 MySqlCommand cmd = new MySqlCommand(sql, conn);
                 MySqlDataReader rdr = cmd.ExecuteReader();
 
