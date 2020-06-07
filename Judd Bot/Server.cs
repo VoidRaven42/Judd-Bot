@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Reflection;
@@ -59,13 +61,13 @@ namespace Judd_Bot
                         stream.Write(reply, 0, reply.Length);
                         Console.WriteLine("{1}: Response Returned: {0}", str + data.Remove(0, 7), Thread.CurrentThread.ManagedThreadId);
                         var todo = data.Remove(0, 7);
-                        var splitted = todo.Split(new[] { ',' }, 2);
+                        var splitted = todo.Split(' ');
                         foreach (var elem in splitted)
                         {
                             Console.WriteLine(elem);
                         }
-                        //AdminCommands admin = new AdminCommands();
-                        //assign.Assign(splitted[0], splitted[1]);
+                        AdministrationCommands admin = new AdministrationCommands();
+                        admin.Assign(splitted[0], splitted[1]);
                     }
                     else
                     {

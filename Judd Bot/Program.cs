@@ -8,7 +8,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
-using DSharpPlus.Interactivity;
 
 
 namespace Judd_Bot
@@ -17,7 +16,6 @@ namespace Judd_Bot
     {
         private static DiscordClient discord;
         private static CommandsNextExtension commands;
-        private static InteractivityExtension interactivity;
         private static string token = File.ReadAllText(@"token.txt");
 
         public static void Main(string[] args)
@@ -57,10 +55,10 @@ namespace Judd_Bot
             });
 
             commands.RegisterCommands<Commands>();
-            commands.RegisterCommands<AdminCommands>();
+            commands.RegisterCommands<AdministrationCommands>();
 
-            discord.ConnectAsync();
-            Run();
+            await discord.ConnectAsync();
+            await Run();
             await Task.Delay(-1);
 
         }
@@ -69,6 +67,7 @@ namespace Judd_Bot
         {
             Int32 port = 50000;
             Server socketserver = new Server(port);
+            return;
         }
     }
 }
