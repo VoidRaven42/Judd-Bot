@@ -359,5 +359,6 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
-#Token
+#Files with sensitive data
 token.txt
+sqlinfo.txt

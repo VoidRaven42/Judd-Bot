@@ -12,6 +12,7 @@
     <PackageReference Include="DSharpPlus.CommandsNext" Version="4.0.0-nightly-00702" />
     <PackageReference Include="DSharpPlus.Interactivity" Version="4.0.0-nightly-00702" />
     <PackageReference Include="DSharpPlus.Rest" Version="4.0.0-nightly-00702" />
+    <PackageReference Include="MySql.Data" Version="8.0.20" />
   </ItemGroup>
 
 </Project>
