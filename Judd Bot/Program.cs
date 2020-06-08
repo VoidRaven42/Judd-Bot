@@ -12,6 +12,7 @@ namespace Judd_Bot
         private static DiscordClient discord;
         private static CommandsNextExtension commands;
         private static readonly string token = File.ReadAllText(@"token.txt");
+        private static Server server = new Server();
 
         public static void Main(string[] args)
         {
@@ -36,6 +37,7 @@ namespace Judd_Bot
                 LogLevel = LogLevel.Debug
             });
 
+            
             discord.GuildMemberAdded += Discord_GuildMemberAdded;
 
             string[] prefixes = {"!"};
@@ -50,10 +52,8 @@ namespace Judd_Bot
             await discord.ConnectAsync();
             await Task.Delay(-1);
         }
-        
-        Server server = new Server();
 
-        private async Task Discord_GuildMemberAdded(GuildMemberAddEventArgs e)
+        private static async Task Discord_GuildMemberAdded(GuildMemberAddEventArgs e)
         {
             await server.SQLQuery(e.Member.Id.ToString());
         }

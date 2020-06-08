@@ -60,6 +60,8 @@ namespace Judd_Bot
     [RequirePermissions(Permissions.ManageGuild)]
     public class AdministrationCommands : BaseCommandModule
     {
+        Server server = new Server();
+
         [Command("getid")]
         public async Task Getid(CommandContext ctx)
         {
@@ -69,7 +71,7 @@ namespace Judd_Bot
         [Command("sql")]
         public async Task sql(CommandContext ctx, string id)
         {
-            await Server.SQLQuery(id);
+            await server.SQLQuery(id);
         }
 
         [Command("assignroles")]
