@@ -7,20 +7,32 @@ namespace Judd_Bot
 {
     internal class Server
     {
-        public static async Task SQLQuery(string usertofind)
+        private static readonly string dbinfo = File.ReadAllText(@"sqlinfo.txt");
+        private MySqlConnection conn = new MySqlConnection(dbinfo);
+
+        public Server()
         {
-            var dbinfo = File.ReadAllText(@"sqlinfo.txt");
-            var conn = new MySqlConnection(dbinfo);
             try
             {
-                Console.WriteLine("Connecting to Database...");
+                Console.WriteLine("Connecting to Database");
                 conn.Open();
+                Console.WriteLine("Connected");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+        }
 
-                var sql = "SELECT Name, HeadOfState FROM Country WHERE Continent='Oceania'"; //Placeholder
+        public async Task SQLQuery(string usertofind)
+        {
+            try
+            {
+                var sql = $"SELECT email FROM users WHERE d_user_snowflake='{usertofind}'";
                 var cmd = new MySqlCommand(sql, conn);
                 var rdr = cmd.ExecuteReader();
 
-                while (rdr.Read()) Console.WriteLine(rdr[0] + " -- " + rdr[1]);
+                while (rdr.Read()) Console.WriteLine(rdr[0]);
                 rdr.Close();
             }
             catch (Exception ex)
@@ -28,7 +40,6 @@ namespace Judd_Bot
                 Console.WriteLine(ex.ToString());
             }
 
-            conn.Close();
             Console.WriteLine("SQL query complete.");
         }
     }

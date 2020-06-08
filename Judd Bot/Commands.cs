@@ -66,6 +66,12 @@ namespace Judd_Bot
             await ctx.RespondAsync(ctx.Guild.Id.ToString());
         }
 
+        [Command("sql")]
+        public async Task sql(CommandContext ctx, string id)
+        {
+            await Server.SQLQuery(id);
+        }
+
         [Command("assignroles")]
         public async Task Assign(CommandContext ctx, string message)
         {

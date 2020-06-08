@@ -50,10 +50,12 @@ namespace Judd_Bot
             await discord.ConnectAsync();
             await Task.Delay(-1);
         }
+        
+        Server server = new Server();
 
-        private static async Task Discord_GuildMemberAdded(GuildMemberAddEventArgs e)
+        private async Task Discord_GuildMemberAdded(GuildMemberAddEventArgs e)
         {
-            await Server.SQLQuery(e.Member.Id.ToString());
+            await server.SQLQuery(e.Member.Id.ToString());
         }
     }
 }
