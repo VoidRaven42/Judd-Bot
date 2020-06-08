@@ -1,14 +1,9 @@
 using System;
 using System.IO;
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading;
 using System.Threading.Tasks;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
-
+using DSharpPlus.EventArgs;
 
 namespace Judd_Bot
 {
@@ -16,7 +11,7 @@ namespace Judd_Bot
     {
         private static DiscordClient discord;
         private static CommandsNextExtension commands;
-        private static string token = File.ReadAllText(@"token.txt");
+        private static readonly string token = File.ReadAllText(@"token.txt");
 
         public static void Main(string[] args)
         {
@@ -29,7 +24,6 @@ namespace Judd_Bot
                 Console.WriteLine(e);
                 throw;
             }
-            
         }
 
         private static async Task MainAsync(string[] args)
@@ -44,7 +38,7 @@ namespace Judd_Bot
 
             discord.GuildMemberAdded += Discord_GuildMemberAdded;
 
-            string[] prefixes = { "!" };
+            string[] prefixes = {"!"};
             commands = discord.UseCommandsNext(new CommandsNextConfiguration
             {
                 StringPrefixes = prefixes
@@ -55,10 +49,9 @@ namespace Judd_Bot
 
             await discord.ConnectAsync();
             await Task.Delay(-1);
-
         }
 
-        private static async Task Discord_GuildMemberAdded(DSharpPlus.EventArgs.GuildMemberAddEventArgs e)
+        private static async Task Discord_GuildMemberAdded(GuildMemberAddEventArgs e)
         {
             await Server.SQLQuery(e.Member.Id.ToString());
         }

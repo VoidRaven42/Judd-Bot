@@ -1,19 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
 using System.Threading.Tasks;
-using Discord;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
-using DSharpPlus.CommandsNext.Converters;
-using DSharpPlus.Entities;
-using DSharpPlus.Interactivity;
-using ChannelType = DSharpPlus.ChannelType;
-using TokenType = DSharpPlus.TokenType;
 
 namespace Judd_Bot
 {
@@ -22,26 +13,24 @@ namespace Judd_Bot
         [Command("wood")]
         public async Task Hi(CommandContext ctx)
         {
-            await ctx.RespondAsync("\n⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⢀⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⡀⠄⠄⠄⢀⠄⠄⠈⠄⠄⠄⠄⠄⠄⠄⠠⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⣌⠄⠪⠢⠁⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⡀⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⡐⠜⠄⠄⠄⡠⣄⠠⠄⠄⠄⠄⠄⠄⠄⠄⣘⢢⣤⡀⠄⠄⠙⠒⠒⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠤⠯⡂⠁⢠⣴⣿⣿⣿⣦⠄⢀⠄⠄⠄⢠⣴⣔⣿⣿⣿⣿⣷⡀⠄⠄⠄⢰⠉⣁⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⠄⣀⣤⡾⠂⢀⣴⣿⣿⣿⣿⣿⣿⣿⣿⣷⣺⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣧⡀⠄⠄⠈⠄⠂⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⠄⣠⣒⠑⠄⣸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⠄⠄⠄⠐⡁⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⠄⢼⡇⠄⢰⢺⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣆⠄⠄⣹⡗⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⠠⣿⠇⠄⢂⡜⠛⠿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣇⠄⠐⡃⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⢀⢛⠄⠄⠈⡿⣷⣶⡌⠉⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⢟⣫⣿⣷⣶⡯⣿⡆⠄⠠⡀⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⠘⠄⠄⠄⠄⢸⡜⣿⣿⣷⣄⡀⠙⠿⣿⣿⣿⣿⣿⡿⠟⢁⣠⣾⠿⣿⣿⣿⣿⣾⡿⠠⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⠐⠄⠄⠄⠄⠘⣡⣿⣿⠃⠉⠛⢦⣀⠈⠛⣿⣿⠋⠄⡤⠞⠋⠄⢠⣿⣿⡿⣿⣿⡇⠄⠄⢠⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠠⠶⢄⠄⠄⣾⡰⠟⠉⠁⠄⠄⠄⠄⠈⠁⠄⢹⡇⠄⠈⠄⠄⠄⠄⠄⠉⠛⢷⣹⣿⡇⠄⢂⡴⡦⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⠠⢀⠄⠈⡷⠅⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⣸⣧⡀⠄⠄⠄⠄⠄⠄⠄⣀⣘⣿⣿⡏⠄⢈⡀⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⠄⠈⠄⠄⣿⣷⣷⣲⣤⣀⣀⣀⣤⣦⣦⣾⣿⣿⣿⣶⣴⣆⣤⣤⣴⣶⣿⣿⣿⣿⣗⡄⢙⡇⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⠄⣀⣀⡇⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣾⠇⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⠄⠘⠛⢀⠄⠙⠛⠛⠛⠛⠉⠭⠚⠉⠛⠛⠛⠛⠛⠛⣽⣷⣤⠉⠛⣿⣿⣿⣿⣿⣿⣿⠁⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⠄⠄⠈⠛⠄⠄⠄⣤⡆⠄⠄⠈⣽⣤⣀⣀⠄⣀⣠⣾⣿⣿⣿⣆⠄⢸⣿⣿⣿⣿⡿⠟⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⢸⣧⡄⠄⠄⠄⣤⣤⣤⣭⣭⣤⣶⣶⣦⡌⢿⠗⣼⣿⣿⣿⣿⡇⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⢸⣿⣇⠄⠄⡴⠉⠉⠉⡉⣉⣩⣿⣿⣿⣿⠄⠄⠘⣿⡟⠋⠘⠃⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⡀⡀⠄⢻⣿⠄⢸⣏⣿⣿⣷⣿⣿⣿⣿⣿⣿⣿⡀⢀⣰⣿⡇⠄⣠⡀⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⢠⣴⣶⣿⣿⣿⣿⡀⠘⠻⣶⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⣿⣿⣾⣿⡿⠃⢀⣿⣧⣀⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⢀⣼⣿⣿⣿⣿⣿⣿⣿⣷⠄⠄⠄⠄⠄⠄⠈⠉⠉⠉⠄⠄⠄⠄⠄⠙⠛⠋⣀⣸⣿⣿⣿⠏⠁⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⢀⣤⣶⣿⣿⣿⡿⠃⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣇⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⢀⣶⣶⣿⣿⣿⣿⣿⠟⠄⠄⠄⠄⠄⠄⠁⠔⣄⡀⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⣠⣿⣿⣿⣿⣿⣿⣿⣿⢿⣿⣿⣄⡀⠄⠄⠄⠄⢀⣠⣴⣿⣿⣿⣿⣿⣿⣿⡿⠇⠄⠄⠄⠄⠄⠈⠄⠈⠉⠩⠉⢙⠷⡄⣀\n");
+            await ctx.RespondAsync(
+                "\n⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⢀⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⡀⠄⠄⠄⢀⠄⠄⠈⠄⠄⠄⠄⠄⠄⠄⠠⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⣌⠄⠪⠢⠁⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⡀⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⡐⠜⠄⠄⠄⡠⣄⠠⠄⠄⠄⠄⠄⠄⠄⠄⣘⢢⣤⡀⠄⠄⠙⠒⠒⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠤⠯⡂⠁⢠⣴⣿⣿⣿⣦⠄⢀⠄⠄⠄⢠⣴⣔⣿⣿⣿⣿⣷⡀⠄⠄⠄⢰⠉⣁⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⠄⣀⣤⡾⠂⢀⣴⣿⣿⣿⣿⣿⣿⣿⣿⣷⣺⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣧⡀⠄⠄⠈⠄⠂⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⠄⣠⣒⠑⠄⣸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⠄⠄⠄⠐⡁⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⠄⢼⡇⠄⢰⢺⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣆⠄⠄⣹⡗⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⠠⣿⠇⠄⢂⡜⠛⠿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣇⠄⠐⡃⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⢀⢛⠄⠄⠈⡿⣷⣶⡌⠉⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⢟⣫⣿⣷⣶⡯⣿⡆⠄⠠⡀⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⠘⠄⠄⠄⠄⢸⡜⣿⣿⣷⣄⡀⠙⠿⣿⣿⣿⣿⣿⡿⠟⢁⣠⣾⠿⣿⣿⣿⣿⣾⡿⠠⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⠐⠄⠄⠄⠄⠘⣡⣿⣿⠃⠉⠛⢦⣀⠈⠛⣿⣿⠋⠄⡤⠞⠋⠄⢠⣿⣿⡿⣿⣿⡇⠄⠄⢠⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠠⠶⢄⠄⠄⣾⡰⠟⠉⠁⠄⠄⠄⠄⠈⠁⠄⢹⡇⠄⠈⠄⠄⠄⠄⠄⠉⠛⢷⣹⣿⡇⠄⢂⡴⡦⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⠠⢀⠄⠈⡷⠅⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⣸⣧⡀⠄⠄⠄⠄⠄⠄⠄⣀⣘⣿⣿⡏⠄⢈⡀⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⠄⠈⠄⠄⣿⣷⣷⣲⣤⣀⣀⣀⣤⣦⣦⣾⣿⣿⣿⣶⣴⣆⣤⣤⣴⣶⣿⣿⣿⣿⣗⡄⢙⡇⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⠄⣀⣀⡇⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣾⠇⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⠄⠘⠛⢀⠄⠙⠛⠛⠛⠛⠉⠭⠚⠉⠛⠛⠛⠛⠛⠛⣽⣷⣤⠉⠛⣿⣿⣿⣿⣿⣿⣿⠁⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⠄⠄⠈⠛⠄⠄⠄⣤⡆⠄⠄⠈⣽⣤⣀⣀⠄⣀⣠⣾⣿⣿⣿⣆⠄⢸⣿⣿⣿⣿⡿⠟⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⢸⣧⡄⠄⠄⠄⣤⣤⣤⣭⣭⣤⣶⣶⣦⡌⢿⠗⣼⣿⣿⣿⣿⡇⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⢸⣿⣇⠄⠄⡴⠉⠉⠉⡉⣉⣩⣿⣿⣿⣿⠄⠄⠘⣿⡟⠋⠘⠃⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⡀⡀⠄⢻⣿⠄⢸⣏⣿⣿⣷⣿⣿⣿⣿⣿⣿⣿⡀⢀⣰⣿⡇⠄⣠⡀⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⠄⠄⢠⣴⣶⣿⣿⣿⣿⡀⠘⠻⣶⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⣿⣿⣾⣿⡿⠃⢀⣿⣧⣀⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⢀⣼⣿⣿⣿⣿⣿⣿⣿⣷⠄⠄⠄⠄⠄⠄⠈⠉⠉⠉⠄⠄⠄⠄⠄⠙⠛⠋⣀⣸⣿⣿⣿⠏⠁⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⢀⣤⣶⣿⣿⣿⡿⠃⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣇⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⢀⣶⣶⣿⣿⣿⣿⣿⠟⠄⠄⠄⠄⠄⠄⠁⠔⣄⡀⠄⠄⠄⠄\n⠄⠄⠄⠄⠄⣠⣿⣿⣿⣿⣿⣿⣿⣿⢿⣿⣿⣄⡀⠄⠄⠄⠄⢀⣠⣴⣿⣿⣿⣿⣿⣿⣿⡿⠇⠄⠄⠄⠄⠄⠈⠄⠈⠉⠩⠉⢙⠷⡄⣀\n");
         }
 
         [Command("echo")]
         public async Task Echo(CommandContext ctx, params string[] message)
         {
-            string tosendmessage = "";
-            foreach (var elem in message)
-            {
-                tosendmessage = tosendmessage + elem + " ";
-            }
+            var tosendmessage = "";
+            foreach (var elem in message) tosendmessage = tosendmessage + elem + " ";
             await ctx.RespondAsync(tosendmessage);
         }
-        
+
         [Command("math")]
         [Description("Does simple math, (+, -, *, /), called with \"!math (first num.) (operation) (second num.)\"")]
         [Aliases("maths")]
         public async Task Add(CommandContext ctx, float one, string type, float two)
         {
-            string upper = type.ToUpper();
+            var upper = type.ToUpper();
             switch (upper)
             {
                 case "+":
@@ -65,8 +54,6 @@ namespace Judd_Bot
                     Console.WriteLine($"[COMMAND] ({ctx.User.Username}) Divide {one} by {two}, result {one / two}");
                     break;
             }
-
-            
         }
     }
 
@@ -83,13 +70,10 @@ namespace Judd_Bot
         public async Task Assign(CommandContext ctx, string message)
         {
             var intakeStrings = message.Split(' ').ToList();
-            string classes = "";
+            var classes = "";
             var id = intakeStrings[0];
             intakeStrings.RemoveAt(0);
-            foreach (var elem in intakeStrings)
-            {
-                classes = classes + elem + " ";
-            }
+            foreach (var elem in intakeStrings) classes = classes + elem + " ";
 
             var rolestoadd = classes.Split(',');
             var token = File.ReadAllText(@"token.txt");
@@ -113,17 +97,19 @@ namespace Judd_Bot
                 }
                 else
                 {
-                    var role = await guild.CreateRoleAsync(trimmed, permissions:Permissions.SendMessages);
+                    var role = await guild.CreateRoleAsync(trimmed, Permissions.SendMessages);
                     var channel = await guild.CreateChannelAsync(trimmed, ChannelType.Text);
                     var voicechannel = await guild.CreateChannelAsync(trimmed, ChannelType.Voice);
-                    await discord.ModifyChannelAsync(channel.Id, channel.Name, 0, "", false, parent: 718991556107042817,
-                        bitrate: null, userLimit: 0, perUserRateLimit: 0, "");
-                    await discord.ModifyChannelAsync(voicechannel.Id, voicechannel.Name, 0, "", false, parent: 718945666797404230,
-                        bitrate: 64000, userLimit: 0, perUserRateLimit: 0, "");
+                    await discord.ModifyChannelAsync(channel.Id, channel.Name, 0, "", false, 718991556107042817,
+                        null, 0, 0, "");
+                    await discord.ModifyChannelAsync(voicechannel.Id, voicechannel.Name, 0, "", false,
+                        718945666797404230,
+                        64000, 0, 0, "");
                     await channel.AddOverwriteAsync(role, Permissions.AccessChannels);
                     await voicechannel.AddOverwriteAsync(role, Permissions.AccessChannels);
                     await channel.AddOverwriteAsync(guild.EveryoneRole, Permissions.None, Permissions.AccessChannels);
-                    await voicechannel.AddOverwriteAsync(guild.EveryoneRole, Permissions.None, Permissions.AccessChannels);
+                    await voicechannel.AddOverwriteAsync(guild.EveryoneRole, Permissions.None,
+                        Permissions.AccessChannels);
                     await discord.AddGuildMemberRoleAsync(718945666348351570, userid, role.Id, "");
                 }
             }
