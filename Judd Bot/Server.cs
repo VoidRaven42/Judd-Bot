@@ -3,11 +3,13 @@ using System.Collections.Immutable;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using static System.Console;
 using System.Threading.Tasks;
 using DSharpPlus;
 using DSharpPlus.Entities;
 using MySql.Data.MySqlClient;
+using Org.BouncyCastle.Bcpg.OpenPgp;
 
 namespace Judd_Bot
 {
@@ -85,13 +87,13 @@ namespace Judd_Bot
                     if (rolelist[i] == "")
                     {
                         var classrole = await AssignSingleRole(usertofind, classlist[i]);
-                        sql = $"UPDATE classes SET d_role_snowflake='{classrole}' WHERE g_class_id='{idlist[i]}'";
-                        cmd = new MySqlCommand(sql, conn);
+                        var sql = $"UPDATE classes SET d_role_snowflake='{classrole}' WHERE g_class_id='{idlist[i]}'";
+                        var cmd = new MySqlCommand(sql, conn);
                         cmd.ExecuteNonQuery();
                     }
                     else
                     {
-                        await AssignExistingRole(usertofind, rolelist[i]);
+                        AssignExistingRole(usertofind, rolelist[i]);
                     }
                 }
             }
@@ -102,6 +104,8 @@ namespace Judd_Bot
 
             WriteLine("SQL operation complete.");
         }
+
+        public async Task 
 
         public async Task AssignExistingRole(string id, string roletoadd)
         {
@@ -116,7 +120,7 @@ namespace Judd_Bot
             }
             else
             {
-                await discordrest.AddGuildMemberRoleAsync(718945666348351570, userid, roleid, "");
+                discordrest.AddGuildMemberRoleAsync(718945666348351570, userid, roleid, "");
             }
         }
 
@@ -137,17 +141,11 @@ namespace Judd_Bot
                 var role = await guild.CreateRoleAsync(trimmed, Permissions.SendMessages);
                 var channel = await guild.CreateChannelAsync(trimmed, ChannelType.Text);
                 var voicechannel = await guild.CreateChannelAsync(trimmed, ChannelType.Voice);
-                await discordrest.ModifyChannelAsync(channel.Id, channel.Name, 0, "", false, 718991556107042817,
-                    null, 0, 0, "");
-                await discordrest.ModifyChannelAsync(voicechannel.Id, voicechannel.Name, 0, "", false,
-                    718945666797404230,
-                    64000, 0, 0, "");
-                await channel.AddOverwriteAsync(role, Permissions.AccessChannels);
-                await voicechannel.AddOverwriteAsync(role, Permissions.AccessChannels);
-                await channel.AddOverwriteAsync(guild.EveryoneRole, Permissions.None, Permissions.AccessChannels);
-                await voicechannel.AddOverwriteAsync(guild.EveryoneRole, Permissions.None,
-                    Permissions.AccessChannels);
-                await discordrest.AddGuildMemberRoleAsync(718945666348351570, userid, role.Id, "");
+                channel.AddOverwriteAsync(role, Permissions.AccessChannels);
+                voicechannel.AddOverwriteAsync(role, Permissions.AccessChannels); 
+                channel.AddOverwriteAsync(guild.EveryoneRole, Permissions.None, Permissions.AccessChannels);
+                voicechannel.AddOverwriteAsync(guild.EveryoneRole, Permissions.None, Permissions.AccessChannels);
+                discordrest.AddGuildMemberRoleAsync(718945666348351570, userid, role.Id, "");
                 return role.Id.ToString();
             }
             
