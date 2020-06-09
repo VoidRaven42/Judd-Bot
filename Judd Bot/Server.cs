@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Immutable;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using static System.Console;
@@ -12,6 +13,8 @@ namespace Judd_Bot
     internal class Server
     {
         private static readonly string dbinfo = File.ReadAllText(@"sqlinfo.txt");
+        private string token = File.ReadAllText(@"token.txt");
+
         private MySqlConnection conn = new MySqlConnection(dbinfo);
 
         public Server()
@@ -73,10 +76,13 @@ namespace Judd_Bot
                     if (rolelist[i] == "")
                     {
                         var classrole = await AssignSingleRole(usertofind, classlist[i]);
+                        sql = $"INSERT INTO classes (d_role_snowflake) VALUES ('{classrole}')";
+                        cmd = new MySqlCommand(sql, conn);
+                        cmd.ExecuteNonQuery();
                     }
                     else
                     {
-                        AssignExistingRole(usertofind, rolelist[i]);
+                        await AssignExistingRole(usertofind, rolelist[i]);
                     }
                 }
             }
@@ -88,15 +94,24 @@ namespace Judd_Bot
             WriteLine("SQL query complete.");
         }
 
-        public async Task AssignExistingRole(string userid, string roleid)
+        public async Task AssignExistingRole(string id, string roletoadd)
         {
-            
+            var roleid = ulong.Parse(roletoadd);
+            var discord = new DiscordRestClient(
+                new DiscordConfiguration
+            {
+                Token = token,
+                TokenType = TokenType.Bot,
+                UseInternalLogHandler = true,
+                LogLevel = LogLevel.Debug
+            });
+            var userid = Convert.ToUInt64(id);
+            var guild = await discord.GetGuildAsync(718945666348351570);
+            await discord.AddGuildMemberRoleAsync(718945666348351570, userid, roleid, "");
         }
 
         public async Task<string> AssignSingleRole(string id, string roletoadd)
         {
-            var token = File.ReadAllText(@"token.txt");
-
             var discord = new DiscordRestClient(new DiscordConfiguration
             {
                 Token = token,
