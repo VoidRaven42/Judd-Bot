@@ -6,6 +6,7 @@ using System.Linq;
 using static System.Console;
 using System.Threading.Tasks;
 using DSharpPlus;
+using DSharpPlus.Entities;
 using MySql.Data.MySqlClient;
 
 namespace Judd_Bot
@@ -13,15 +14,20 @@ namespace Judd_Bot
     internal class Server
     {
         private static readonly string dbinfo = File.ReadAllText(@"sqlinfo.txt");
-        private string token = File.ReadAllText(@"token.txt");
+        private static string token = File.ReadAllText(@"token.txt");
 
         private MySqlConnection conn = new MySqlConnection(dbinfo);
+
+        private DiscordRestClient discordrest = new DiscordRestClient(new DiscordConfiguration {Token = token, TokenType = TokenType.Bot, UseInternalLogHandler = true, LogLevel = LogLevel.Debug});
+        private DiscordClient discord = new DiscordClient(new DiscordConfiguration {Token = token, TokenType = TokenType.Bot, UseInternalLogHandler = true, LogLevel = LogLevel.Debug});
+
 
         public Server()
         {
             try
             {
                 conn.Open();
+                WriteLine("Connected to SQL DB");
             }
             catch (Exception e)
             {
@@ -56,6 +62,7 @@ namespace Judd_Bot
 
                 var splitids = classroomids.Split(',');
                 var idlist = splitids.ToList();
+                idlist.RemoveAt(idlist.Count - 1);
                 foreach (var elem in idlist)
                 {
                     sql = $"SELECT class_display_name, d_role_snowflake FROM classes WHERE g_class_id='{elem}'";
@@ -70,13 +77,15 @@ namespace Judd_Bot
                     rdr.Close();
                 }
                 var classlist = classroomnames.Split(',').ToList();
+                classlist.RemoveAt(classlist.Count - 1);
                 var rolelist = rolestocheck.Split(',').ToList();
+                rolelist.RemoveAt(rolelist.Count - 1);
                 for (int i = 0; i < rolelist.Count; i++)
                 {
                     if (rolelist[i] == "")
                     {
                         var classrole = await AssignSingleRole(usertofind, classlist[i]);
-                        sql = $"INSERT INTO classes (d_role_snowflake) VALUES ('{classrole}')";
+                        sql = $"UPDATE classes SET d_role_snowflake='{classrole}' WHERE g_class_id='{idlist[i]}'";
                         cmd = new MySqlCommand(sql, conn);
                         cmd.ExecuteNonQuery();
                     }
@@ -91,42 +100,36 @@ namespace Judd_Bot
                 WriteLine(ex.ToString());
             }
 
-            WriteLine("SQL query complete.");
+            WriteLine("SQL operation complete.");
         }
 
         public async Task AssignExistingRole(string id, string roletoadd)
         {
             var roleid = ulong.Parse(roletoadd);
-            var discord = new DiscordRestClient(
-                new DiscordConfiguration
-            {
-                Token = token,
-                TokenType = TokenType.Bot,
-                UseInternalLogHandler = true,
-                LogLevel = LogLevel.Debug
-            });
+
             var userid = Convert.ToUInt64(id);
             var guild = await discord.GetGuildAsync(718945666348351570);
-            await discord.AddGuildMemberRoleAsync(718945666348351570, userid, roleid, "");
+            var user = await guild.GetMemberAsync(userid);
+            if (user.Roles.Any(tr => tr.Name.Equals(roletoadd)))
+            {
+                return;
+            }
+            else
+            {
+                await discordrest.AddGuildMemberRoleAsync(718945666348351570, userid, roleid, "");
+            }
         }
 
         public async Task<string> AssignSingleRole(string id, string roletoadd)
         {
-            var discord = new DiscordRestClient(new DiscordConfiguration
-            {
-                Token = token,
-                TokenType = TokenType.Bot,
-                UseInternalLogHandler = true,
-                LogLevel = LogLevel.Debug
-            });
-            var userid = Convert.ToUInt64(id);
-            var guild = await discord.GetGuildAsync(718945666348351570);
             
+            var userid = Convert.ToUInt64(id);
+            var guild = await discordrest.GetGuildAsync(718945666348351570);
             var trimmed = roletoadd.Trim();
             if (guild.Roles.Any(tr => tr.Value.Name.Equals(trimmed)))
             {
                 var roleid = guild.Roles.FirstOrDefault(x => x.Value.Name.ToString() == trimmed).Key;
-                await discord.AddGuildMemberRoleAsync(718945666348351570, userid, roleid, "");
+                await discordrest.AddGuildMemberRoleAsync(718945666348351570, userid, roleid, "");
                 return roleid.ToString();
             }
             else
@@ -134,9 +137,9 @@ namespace Judd_Bot
                 var role = await guild.CreateRoleAsync(trimmed, Permissions.SendMessages);
                 var channel = await guild.CreateChannelAsync(trimmed, ChannelType.Text);
                 var voicechannel = await guild.CreateChannelAsync(trimmed, ChannelType.Voice);
-                await discord.ModifyChannelAsync(channel.Id, channel.Name, 0, "", false, 718991556107042817,
+                await discordrest.ModifyChannelAsync(channel.Id, channel.Name, 0, "", false, 718991556107042817,
                     null, 0, 0, "");
-                await discord.ModifyChannelAsync(voicechannel.Id, voicechannel.Name, 0, "", false,
+                await discordrest.ModifyChannelAsync(voicechannel.Id, voicechannel.Name, 0, "", false,
                     718945666797404230,
                     64000, 0, 0, "");
                 await channel.AddOverwriteAsync(role, Permissions.AccessChannels);
@@ -144,7 +147,7 @@ namespace Judd_Bot
                 await channel.AddOverwriteAsync(guild.EveryoneRole, Permissions.None, Permissions.AccessChannels);
                 await voicechannel.AddOverwriteAsync(guild.EveryoneRole, Permissions.None,
                     Permissions.AccessChannels);
-                await discord.AddGuildMemberRoleAsync(718945666348351570, userid, role.Id, "");
+                await discordrest.AddGuildMemberRoleAsync(718945666348351570, userid, role.Id, "");
                 return role.Id.ToString();
             }
             
