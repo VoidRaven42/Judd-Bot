@@ -82,18 +82,15 @@ namespace Judd_Bot
                 classlist.RemoveAt(classlist.Count - 1);
                 var rolelist = rolestocheck.Split(',').ToList();
                 rolelist.RemoveAt(rolelist.Count - 1);
-                for (int i = 0; i < rolelist.Count; i++)
+                for (int i = 0; i < rolelist.Count - 1; i++)
                 {
                     if (rolelist[i] == "")
                     {
-                        var classrole = await AssignSingleRole(usertofind, classlist[i]);
-                        var sql = $"UPDATE classes SET d_role_snowflake='{classrole}' WHERE g_class_id='{idlist[i]}'";
-                        var cmd = new MySqlCommand(sql, conn);
-                        cmd.ExecuteNonQuery();
+                        await AssignSingleRole(usertofind, classlist[i], idlist[i]);
                     }
                     else
                     {
-                        AssignExistingRole(usertofind, rolelist[i]);
+                        await AssignExistingRole(usertofind, rolelist[i]);
                     }
                 }
             }
@@ -105,7 +102,6 @@ namespace Judd_Bot
             WriteLine("SQL operation complete.");
         }
 
-        public async Task 
 
         public async Task AssignExistingRole(string id, string roletoadd)
         {
@@ -120,11 +116,12 @@ namespace Judd_Bot
             }
             else
             {
-                discordrest.AddGuildMemberRoleAsync(718945666348351570, userid, roleid, "");
+                await discordrest.AddGuildMemberRoleAsync(718945666348351570, userid, roleid, "");
+                return;
             }
         }
 
-        public async Task<string> AssignSingleRole(string id, string roletoadd)
+        public async Task AssignSingleRole(string id, string roletoadd, string classid)
         {
             
             var userid = Convert.ToUInt64(id);
@@ -134,7 +131,10 @@ namespace Judd_Bot
             {
                 var roleid = guild.Roles.FirstOrDefault(x => x.Value.Name.ToString() == trimmed).Key;
                 await discordrest.AddGuildMemberRoleAsync(718945666348351570, userid, roleid, "");
-                return roleid.ToString();
+                var sql = $"UPDATE classes SET d_role_snowflake='{roleid}' WHERE g_class_id='{classid}'";
+                var cmd = new MySqlCommand(sql, conn);
+                cmd.ExecuteNonQuery();
+                return;
             }
             else
             {
@@ -146,7 +146,10 @@ namespace Judd_Bot
                 channel.AddOverwriteAsync(guild.EveryoneRole, Permissions.None, Permissions.AccessChannels);
                 voicechannel.AddOverwriteAsync(guild.EveryoneRole, Permissions.None, Permissions.AccessChannels);
                 discordrest.AddGuildMemberRoleAsync(718945666348351570, userid, role.Id, "");
-                return role.Id.ToString();
+                var sql = $"UPDATE classes SET d_role_snowflake='{role.Id}' WHERE g_class_id='{classid}'";
+                var cmd = new MySqlCommand(sql, conn);
+                cmd.ExecuteNonQuery();
+                return;
             }
             
         }
