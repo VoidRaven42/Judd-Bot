@@ -1,27 +1,25 @@
 ﻿using System;
-using System.Collections.Immutable;
-using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Threading;
-using static System.Console;
 using System.Threading.Tasks;
 using DSharpPlus;
-using DSharpPlus.Entities;
 using MySql.Data.MySqlClient;
-using Org.BouncyCastle.Bcpg.OpenPgp;
+using static System.Console;
 
 namespace Judd_Bot
 {
     internal class Server
     {
         private static readonly string dbinfo = File.ReadAllText(@"sqlinfo.txt");
-        private static string token = File.ReadAllText(@"token.txt");
+        private static readonly string token = File.ReadAllText(@"token.txt");
 
-        private MySqlConnection conn = new MySqlConnection(dbinfo);
+        private readonly MySqlConnection conn = new MySqlConnection(dbinfo);
 
-        private DiscordRestClient discordrest = new DiscordRestClient(new DiscordConfiguration {Token = token, TokenType = TokenType.Bot, UseInternalLogHandler = true, LogLevel = LogLevel.Debug});
-        private DiscordClient discord = new DiscordClient(new DiscordConfiguration {Token = token, TokenType = TokenType.Bot, UseInternalLogHandler = true, LogLevel = LogLevel.Debug});
+        private readonly DiscordClient discord = new DiscordClient(new DiscordConfiguration
+            {Token = token, TokenType = TokenType.Bot, UseInternalLogHandler = true, LogLevel = LogLevel.Debug});
+
+        private readonly DiscordRestClient discordrest = new DiscordRestClient(new DiscordConfiguration
+            {Token = token, TokenType = TokenType.Bot, UseInternalLogHandler = true, LogLevel = LogLevel.Debug});
 
 
         public Server()
@@ -33,7 +31,7 @@ namespace Judd_Bot
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                WriteLine(e);
             }
         }
 
@@ -52,7 +50,9 @@ namespace Judd_Bot
                 while (rdr.Read()) email = email + rdr[0];
                 rdr.Close();
 
-                if (email.EndsWith("@judd.kent.sch.uk")){}
+                if (email.EndsWith("@judd.kent.sch.uk"))
+                {
+                }
                 else
                 {
                     await KickUser(usertofind);
@@ -66,10 +66,8 @@ namespace Judd_Bot
                 cmd = new MySqlCommand(sql, conn);
                 rdr = cmd.ExecuteReader();
 
-                while (rdr.Read())
-                {
-                    classroomids = classroomids + rdr[0] + ',';
-                }
+                while (rdr.Read()) classroomids = classroomids + rdr[0] + ',';
+
                 rdr.Close();
 
                 var splitids = classroomids.Split(',');
@@ -86,23 +84,19 @@ namespace Judd_Bot
                         classroomnames = classroomnames + rdr[0] + ',';
                         rolestocheck = rolestocheck + rdr[1] + ',';
                     }
+
                     rdr.Close();
                 }
+
                 var classlist = classroomnames.Split(',').ToList();
                 classlist.RemoveAt(classlist.Count - 1);
                 var rolelist = rolestocheck.Split(',').ToList();
                 rolelist.RemoveAt(rolelist.Count - 1);
-                for (int i = 0; i < rolelist.Count - 1; i++)
-                {
+                for (var i = 0; i < rolelist.Count; i++)
                     if (rolelist[i] == "")
-                    {
                         await AssignSingleRole(usertofind, classlist[i], idlist[i]);
-                    }
                     else
-                    {
                         await AssignExistingRole(usertofind, rolelist[i]);
-                    }
-                }   
             }
             catch (Exception ex)
             {
@@ -121,14 +115,8 @@ namespace Judd_Bot
             var guild = await discord.GetGuildAsync(718945666348351570);
             var user = await guild.GetMemberAsync(userid);
             if (user.Roles.Any(tr => tr.Name.Equals(roletoadd)))
-            {
                 return;
-            }
-            else
-            {
-                await discordrest.AddGuildMemberRoleAsync(718945666348351570, userid, roleid, "");
-                return;
-            }
+            await discordrest.AddGuildMemberRoleAsync(718945666348351570, userid, roleid, "");
         }
 
         public async Task KickUser(string id)
@@ -136,12 +124,12 @@ namespace Judd_Bot
             var guild = await discord.GetGuildAsync(718945666348351570);
             var member = await guild.GetMemberAsync(Convert.ToUInt64(id));
             await discordrest.RemoveGuildMemberAsync(718945666348351570, Convert.ToUInt64(id), "Not Judd Email");
-            member.SendMessageAsync("Hi! Judd Bot here!\nYou tried to authenticate with an email not from Judd. Please go back to the website and log in with your school Google Account.");
+            member.SendMessageAsync(
+                "Hi! Judd Bot here!\nYou tried to authenticate with an email not from Judd. Please go back to the website and log in with your school Google Account.");
         }
 
         public async Task AssignSingleRole(string id, string roletoadd, string classid)
         {
-            
             var userid = Convert.ToUInt64(id);
             var guild = await discordrest.GetGuildAsync(718945666348351570);
             var trimmed = roletoadd.Trim();
@@ -152,21 +140,21 @@ namespace Judd_Bot
                 var sql = $"UPDATE classes SET d_role_snowflake='{roleid}' WHERE g_class_id='{classid}'";
                 var cmd = new MySqlCommand(sql, conn);
                 cmd.ExecuteNonQuery();
-                return;
             }
             else
             {
                 var role = await guild.CreateRoleAsync(trimmed, Permissions.SendMessages);
                 var channel = await guild.CreateChannelAsync(trimmed, ChannelType.Text);
-                channel.AddOverwriteAsync(role, Permissions.AccessChannels); 
+                channel.AddOverwriteAsync(role, Permissions.AccessChannels);
                 channel.AddOverwriteAsync(guild.EveryoneRole, Permissions.None, Permissions.AccessChannels);
                 discordrest.AddGuildMemberRoleAsync(718945666348351570, userid, role.Id, "");
                 var sql = $"UPDATE classes SET d_role_snowflake='{role.Id}' WHERE g_class_id='{classid}'";
                 var cmd = new MySqlCommand(sql, conn);
                 cmd.ExecuteNonQuery();
-                return;
+                sql = $"UPDATE classes SET d_text_channel_snowflake='{channel.Id}' WHERE g_class_id='{classid}'";
+                cmd = new MySqlCommand(sql, conn);
+                cmd.ExecuteNonQuery();
             }
-            
         }
     }
 }
