@@ -52,6 +52,16 @@ namespace Judd_Bot
                 while (rdr.Read()) email = email + rdr[0];
                 rdr.Close();
 
+                if (email.EndsWith("@judd.kent.sch.uk")){}
+                else
+                {
+                    await KickUser(usertofind);
+                    sql = $"DELETE FROM users WHERE d_user_snowflake='{usertofind}'";
+                    cmd = new MySqlCommand(sql, conn);
+                    cmd.ExecuteNonQuery();
+                    return;
+                }
+
                 sql = $"SELECT g_class_id FROM enrollments WHERE email='{email}'";
                 cmd = new MySqlCommand(sql, conn);
                 rdr = cmd.ExecuteReader();
@@ -92,7 +102,7 @@ namespace Judd_Bot
                     {
                         await AssignExistingRole(usertofind, rolelist[i]);
                     }
-                }
+                }   
             }
             catch (Exception ex)
             {
@@ -121,6 +131,14 @@ namespace Judd_Bot
             }
         }
 
+        public async Task KickUser(string id)
+        {
+            var guild = await discord.GetGuildAsync(718945666348351570);
+            var member = await guild.GetMemberAsync(Convert.ToUInt64(id));
+            await discordrest.RemoveGuildMemberAsync(718945666348351570, Convert.ToUInt64(id), "Not Judd Email");
+            member.SendMessageAsync("Hi! Judd Bot here!\nYou tried to authenticate with an email not from Judd. Please go back to the website and log in with your school Google Account.");
+        }
+
         public async Task AssignSingleRole(string id, string roletoadd, string classid)
         {
             
@@ -140,11 +158,8 @@ namespace Judd_Bot
             {
                 var role = await guild.CreateRoleAsync(trimmed, Permissions.SendMessages);
                 var channel = await guild.CreateChannelAsync(trimmed, ChannelType.Text);
-                var voicechannel = await guild.CreateChannelAsync(trimmed, ChannelType.Voice);
-                channel.AddOverwriteAsync(role, Permissions.AccessChannels);
-                voicechannel.AddOverwriteAsync(role, Permissions.AccessChannels); 
+                channel.AddOverwriteAsync(role, Permissions.AccessChannels); 
                 channel.AddOverwriteAsync(guild.EveryoneRole, Permissions.None, Permissions.AccessChannels);
-                voicechannel.AddOverwriteAsync(guild.EveryoneRole, Permissions.None, Permissions.AccessChannels);
                 discordrest.AddGuildMemberRoleAsync(718945666348351570, userid, role.Id, "");
                 var sql = $"UPDATE classes SET d_role_snowflake='{role.Id}' WHERE g_class_id='{classid}'";
                 var cmd = new MySqlCommand(sql, conn);
