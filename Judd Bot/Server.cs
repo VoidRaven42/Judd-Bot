@@ -124,7 +124,7 @@ namespace Judd_Bot
             var guild = await discord.GetGuildAsync(718945666348351570);
             var member = await guild.GetMemberAsync(Convert.ToUInt64(id));
             await discordrest.RemoveGuildMemberAsync(718945666348351570, Convert.ToUInt64(id), "Not Judd Email");
-            member.SendMessageAsync(
+            await member.SendMessageAsync(
                 "Hi! Judd Bot here!\nYou tried to authenticate with an email not from Judd. Please go back to the website and log in with your school Google Account.");
         }
 
@@ -145,14 +145,11 @@ namespace Judd_Bot
             {
                 var role = await guild.CreateRoleAsync(trimmed, Permissions.SendMessages);
                 var channel = await guild.CreateChannelAsync(trimmed, ChannelType.Text);
-                channel.AddOverwriteAsync(role, Permissions.AccessChannels);
-                channel.AddOverwriteAsync(guild.EveryoneRole, Permissions.None, Permissions.AccessChannels);
-                discordrest.AddGuildMemberRoleAsync(718945666348351570, userid, role.Id, "");
-                var sql = $"UPDATE classes SET d_role_snowflake='{role.Id}' WHERE g_class_id='{classid}'";
+                await channel.AddOverwriteAsync(role, Permissions.AccessChannels);
+                await channel.AddOverwriteAsync(guild.EveryoneRole, Permissions.None, Permissions.AccessChannels);
+                await discordrest.AddGuildMemberRoleAsync(718945666348351570, userid, role.Id, "");
+                var sql = $"UPDATE classes SET d_role_snowflake='{role.Id}',d_text_channel_snowflake='{channel.Id}' WHERE g_class_id='{classid}'";
                 var cmd = new MySqlCommand(sql, conn);
-                cmd.ExecuteNonQuery();
-                sql = $"UPDATE classes SET d_text_channel_snowflake='{channel.Id}' WHERE g_class_id='{classid}'";
-                cmd = new MySqlCommand(sql, conn);
                 cmd.ExecuteNonQuery();
             }
         }
