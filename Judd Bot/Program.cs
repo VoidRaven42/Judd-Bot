@@ -17,7 +17,7 @@ namespace Judd_Bot
 
         public static void Main(string[] args)
         {
-            AppDomain.CurrentDomain.ProcessExit += new EventHandler(OnProcessExit);
+            AppDomain.CurrentDomain.ProcessExit += OnProcessExit;
             try
             {
                 MainAsync(args).ConfigureAwait(false).GetAwaiter().GetResult();
@@ -59,7 +59,7 @@ namespace Judd_Bot
 
         private static async Task Commands_CommandErrored(CommandErrorEventArgs e)
         {
-            await e.Context.RespondAsync("Incorrect usage of command");
+            await e.Context.RespondAsync("Incorrect usage of command\nCommand Help:");
             var help = new CommandsNextExtension.DefaultHelpModule();
             await help.DefaultHelpAsync(e.Context, e.Command.Name);
         }
@@ -69,21 +69,10 @@ namespace Judd_Bot
             await server.SQLQuery(e.Member.Id.ToString());
         }
 
-        static async void OnProcessExit(object sender, EventArgs e)
+        static void OnProcessExit(object sender, EventArgs e)
         {
-            try
-            {
-                await discord.DisconnectAsync();
-                await server.discord.DisconnectAsync();
-                await server.conn.CloseAsync();
-                Console.WriteLine("Disconnect successful, exiting in 5 seconds");
-            }
-            catch (Exception exception)
-            {
-                Console.WriteLine(exception);
-                Console.WriteLine("Disconnect unsuccessful, exiting in 5 seconds");
-            }
-
+            Console.WriteLine("Disconnecting, then exiting in 5 seconds");
+            discord.DisconnectAsync();
             Thread.Sleep(5000);
         }
     }
