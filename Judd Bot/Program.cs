@@ -49,8 +49,17 @@ namespace Judd_Bot
             commands.RegisterCommands<Commands>();
             commands.RegisterCommands<AdministrationCommands>();
 
+            commands.CommandErrored += Commands_CommandErrored;
+
             await discord.ConnectAsync();
             await Task.Delay(-1);
+        }
+
+        private static async Task Commands_CommandErrored(CommandErrorEventArgs e)
+        {
+            await e.Context.RespondAsync("Incorrect usage of command");
+            var help = new CommandsNextExtension.DefaultHelpModule();
+            await help.DefaultHelpAsync(e.Context, e.Command.Name);
         }
 
         private static async Task Discord_GuildMemberAdded(GuildMemberAddEventArgs e)
