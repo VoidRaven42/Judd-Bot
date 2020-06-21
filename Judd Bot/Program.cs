@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
@@ -16,6 +17,7 @@ namespace Judd_Bot
 
         public static void Main(string[] args)
         {
+            AppDomain.CurrentDomain.ProcessExit += new EventHandler(OnProcessExit);
             try
             {
                 MainAsync(args).ConfigureAwait(false).GetAwaiter().GetResult();
@@ -65,6 +67,24 @@ namespace Judd_Bot
         private static async Task Discord_GuildMemberAdded(GuildMemberAddEventArgs e)
         {
             await server.SQLQuery(e.Member.Id.ToString());
+        }
+
+        static async void OnProcessExit(object sender, EventArgs e)
+        {
+            try
+            {
+                await discord.DisconnectAsync();
+                await server.discord.DisconnectAsync();
+                await server.conn.CloseAsync();
+                Console.WriteLine("Disconnect successful, exiting in 5 seconds");
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception);
+                Console.WriteLine("Disconnect unsuccessful, exiting in 5 seconds");
+            }
+
+            Thread.Sleep(5000);
         }
     }
 }

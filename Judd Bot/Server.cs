@@ -13,9 +13,9 @@ namespace Judd_Bot
         private static readonly string dbinfo = File.ReadAllText(@"sqlinfo.txt");
         private static readonly string token = File.ReadAllText(@"token.txt");
 
-        private readonly MySqlConnection conn = new MySqlConnection(dbinfo);
+        public readonly MySqlConnection conn = new MySqlConnection(dbinfo);
 
-        private readonly DiscordClient discord = new DiscordClient(new DiscordConfiguration
+        public readonly DiscordClient discord = new DiscordClient(new DiscordConfiguration
             {Token = token, TokenType = TokenType.Bot, UseInternalLogHandler = true, LogLevel = LogLevel.Debug});
 
         private readonly DiscordRestClient discordrest = new DiscordRestClient(new DiscordConfiguration
